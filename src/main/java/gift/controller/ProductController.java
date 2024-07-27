@@ -7,6 +7,8 @@ import gift.service.CategoryService;
 import gift.service.OptionService;
 import gift.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -46,6 +48,11 @@ public class ProductController {
 
     @GetMapping
     @Operation(summary = "Get all products", description = "This API retrieves all products with pagination.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved products."),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String allProducts(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") @Min(1) @Max(30) int size,
@@ -75,6 +82,11 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Add a new product", description = "This API adds a new product.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Successfully added product."),
+        @ApiResponse(responseCode = "400", description = "Invalid product data."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String addProduct(@Valid @ModelAttribute("product") ProductDTO productDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllCategories());
@@ -98,6 +110,12 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing product", description = "This API updates an existing product.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated product."),
+        @ApiResponse(responseCode = "400", description = "Invalid product data."),
+        @ApiResponse(responseCode = "404", description = "Product not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String updateProduct(@Valid @ModelAttribute("product") ProductDTO productDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("categories", categoryService.findAllCategories());
@@ -109,6 +127,11 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product", description = "This API deletes an existing product.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully deleted product."),
+        @ApiResponse(responseCode = "404", description = "Product not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return "redirect:/admin/products";
@@ -116,6 +139,11 @@ public class ProductController {
 
     @GetMapping("/{id}/options")
     @Operation(summary = "Manage product options", description = "This API returns the form to manage options for a product.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved product options."),
+        @ApiResponse(responseCode = "404", description = "Product not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String manageProductOptions(@PathVariable Long id, Model model) {
         ProductDTO productDTO = productService.findProductById(id)
             .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -133,6 +161,11 @@ public class ProductController {
 
     @PostMapping("/{id}/options")
     @Operation(summary = "Update product options", description = "This API updates the options for a product.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated product options."),
+        @ApiResponse(responseCode = "404", description = "Product not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String updateProductOptions(@PathVariable Long id, @RequestParam List<Long> optionIds) {
         productService.updateProductOptions(id, optionIds);
         return "redirect:/admin/products";

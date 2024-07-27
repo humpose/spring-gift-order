@@ -4,6 +4,8 @@ import gift.dto.CategoryDTO;
 import gift.dto.PageRequestDTO;
 import gift.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -37,6 +39,11 @@ public class CategoryController {
 
     @GetMapping
     @Operation(summary = "Get all categories", description = "This API retrieves all categories with pagination.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved categories."),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String allCategories(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") @Min(1) @Max(30) int size,
@@ -65,6 +72,11 @@ public class CategoryController {
 
     @PostMapping
     @Operation(summary = "Add a new category", description = "This API adds a new category.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Successfully added category."),
+        @ApiResponse(responseCode = "400", description = "Invalid category data."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String addCategory(@Valid @ModelAttribute("category") CategoryDTO categoryDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "Add_category";
@@ -86,6 +98,12 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing category", description = "This API updates an existing category.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated category."),
+        @ApiResponse(responseCode = "400", description = "Invalid category data."),
+        @ApiResponse(responseCode = "404", description = "Category not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String updateCategory(@Valid @ModelAttribute("category") CategoryDTO categoryDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "Edit_category";
@@ -96,6 +114,11 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a category", description = "This API deletes an existing category.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully deleted category."),
+        @ApiResponse(responseCode = "404", description = "Category not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return "redirect:/admin/categories";

@@ -6,6 +6,8 @@ import gift.model.User;
 import gift.service.KakaoService;
 import gift.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,10 @@ public class KakaoController {
 
     @GetMapping("/kakao/login")
     @Operation(summary = "Kakao Login", description = "This API redirects the user to the Kakao login page.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "302", description = "Successfully redirected to Kakao login page."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public RedirectView kakaoLogin() {
         String url = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=" + kakaoProperties.getClientId() + "&redirect_uri=" + kakaoProperties.getRedirectUri() + "&scope=account_email";
         return new RedirectView(url);
@@ -38,6 +44,11 @@ public class KakaoController {
 
     @GetMapping("/kakao/callback")
     @Operation(summary = "Kakao Callback", description = "This API handles the Kakao login callback and retrieves the access token and user email.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully authenticated with Kakao."),
+        @ApiResponse(responseCode = "400", description = "Invalid authorization code."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public ResponseEntity<String> kakaoCallback(@RequestParam("code") String authorizationCode, HttpSession session) {
         String accessToken = kakaoService.getAccessToken(authorizationCode);
         String email = kakaoService.getUserEmail(accessToken);

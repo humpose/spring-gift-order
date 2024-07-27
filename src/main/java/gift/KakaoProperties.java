@@ -11,7 +11,6 @@ public class KakaoProperties {
     private final String tokenUrl;
     private final String userInfoUrl;
     private final String sendMessageUrl;
-
     private final String baseUrl;
 
     // Constructor

@@ -4,6 +4,8 @@ import gift.dto.OptionDTO;
 import gift.dto.PageRequestDTO;
 import gift.service.OptionService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -37,6 +39,11 @@ public class OptionController {
 
     @GetMapping
     @Operation(summary = "Get all options", description = "This API retrieves all options with pagination.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved options."),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String allOptions(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") @Min(1) @Max(30) int size,
@@ -65,6 +72,11 @@ public class OptionController {
 
     @PostMapping
     @Operation(summary = "Add a new option", description = "This API adds a new option.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Successfully added option."),
+        @ApiResponse(responseCode = "400", description = "Invalid option data."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String addOption(@Valid @ModelAttribute("option") OptionDTO optionDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "Add_option";
@@ -86,6 +98,12 @@ public class OptionController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing option", description = "This API updates an existing option.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully updated option."),
+        @ApiResponse(responseCode = "400", description = "Invalid option data."),
+        @ApiResponse(responseCode = "404", description = "Option not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String updateOption(@Valid @ModelAttribute("option") OptionDTO optionDTO, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "Edit_option";
@@ -96,6 +114,11 @@ public class OptionController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete an option", description = "This API deletes an existing option.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully deleted option."),
+        @ApiResponse(responseCode = "404", description = "Option not found."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public String deleteOption(@PathVariable Long id) {
         optionService.deleteOption(id);
         return "redirect:/admin/options";

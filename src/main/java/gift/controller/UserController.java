@@ -3,6 +3,8 @@ package gift.controller;
 import gift.dto.UserDTO;
 import gift.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.HashMap;
@@ -57,6 +59,11 @@ public class UserController {
     @PostMapping("/login")
     @ResponseBody
     @Operation(summary = "User login", description = "This API handles user login and returns a token if successful.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully logged in."),
+        @ApiResponse(responseCode = "401", description = "Invalid email or password."),
+        @ApiResponse(responseCode = "500", description = "Internal server error.")
+    })
     public ResponseEntity<Map<String, Object>> login(@ModelAttribute UserDTO userDTO) {
         String token = userService.login(userDTO.getEmail(), userDTO.getPassword());
         Map<String, Object> response = new HashMap<>();

@@ -2,6 +2,8 @@ package gift.api;
 
 import gift.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,11 @@ public class OrderController {
 
     @PostMapping("/api/orders")
     @Operation(summary = "Create order", description = "This API creates a new order.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order created and message sent."),
+        @ApiResponse(responseCode = "400", description = "Invalid product quantity."),
+        @ApiResponse(responseCode = "500", description = "Order created but failed to send message.")
+    })
     public ResponseEntity<String> createOrder(@RequestHeader("Authorization") String authorization, @RequestBody OrderRequest orderRequest) {
         try {
             String responseMessage = orderService.createOrder(authorization, orderRequest);
