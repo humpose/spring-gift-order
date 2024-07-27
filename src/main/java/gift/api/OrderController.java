@@ -20,12 +20,10 @@ public class OrderController {
     }
 
     @PostMapping("/api/orders")
-    @Operation(summary = "Get all orders", description = "This API retrieves all orders.")
+    @Operation(summary = "Create order", description = "This API creates a new order.")
     public ResponseEntity<String> createOrder(@RequestHeader("Authorization") String authorization, @RequestBody OrderRequest orderRequest) {
         try {
-            // Bearer token 추출
-            String token = authorization.replace("Bearer ", "");
-            String responseMessage = orderService.createOrder(token, orderRequest);
+            String responseMessage = orderService.createOrder(authorization, orderRequest);
             return ResponseEntity.ok(responseMessage);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
