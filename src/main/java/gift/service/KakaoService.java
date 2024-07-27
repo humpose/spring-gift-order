@@ -1,6 +1,7 @@
 package gift.service;
 
 import gift.KakaoProperties;
+import gift.KakaoWebClient;
 import gift.exception.KakaoServiceException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,9 +24,9 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 public class KakaoService {
 
     private final KakaoProperties kakaoProperties;
-    private final WebClient kakaoWebClient;
+    private final KakaoWebClient kakaoWebClient;
 
-    public KakaoService(KakaoProperties kakaoProperties, @Qualifier("kakaoWebClient") WebClient kakaoWebClient) {
+    public KakaoService(KakaoProperties kakaoProperties, KakaoWebClient kakaoWebClient) {
         this.kakaoProperties = kakaoProperties;
         this.kakaoWebClient = kakaoWebClient;
     }
@@ -33,7 +34,7 @@ public class KakaoService {
     public String getAccessToken(String authorizationCode) {
         try {
             String url = "/oauth/token";
-            String response = kakaoWebClient.post()
+            String response = kakaoWebClient.getWebClient().post()
                 .uri(url)
                 .body(BodyInserters.fromFormData("grant_type", "authorization_code")
                     .with("client_id", kakaoProperties.getClientId())
@@ -52,7 +53,7 @@ public class KakaoService {
     public String getUserEmail(String accessToken) {
         try {
             String url = kakaoProperties.getUserInfoUrl();
-            String response = kakaoWebClient.get()
+            String response = kakaoWebClient.getWebClient().get()
                 .uri(url)
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
