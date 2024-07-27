@@ -30,7 +30,7 @@ public class UserService {
 
     public String login(String email, String password) {
         User user = userRepository.findByEmail(email);
-        if (user != null && user.matchesPassword(password)) {
+        if (user.matchesPassword(password)) {
             return Jwts.builder()
                 .setSubject(email) // 여기에서 사용자 이메일을 주체로 설정
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))

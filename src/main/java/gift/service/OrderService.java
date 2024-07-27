@@ -30,8 +30,7 @@ public class OrderService {
     private final KakaoService kakaoService;
     private final ObjectMapper objectMapper;
 
-    public OrderService(OptionService optionService, ProductService productService, KakaoProperties kakaoProperties, WebClient webClient,
-        UserService userService, WishListService wishListService, KakaoService kakaoService, ObjectMapper objectMapper) {
+    public OrderService(OptionService optionService, ProductService productService, KakaoProperties kakaoProperties, WebClient webClient, UserService userService, WishListService wishListService, KakaoService kakaoService, ObjectMapper objectMapper) {
         this.optionService = optionService;
         this.productService = productService;
         this.kakaoProperties = kakaoProperties;
@@ -42,10 +41,7 @@ public class OrderService {
         this.objectMapper = objectMapper;
     }
 
-    public String createOrder(String authorization, OrderRequest orderRequest) {
-        // Bearer token 추출
-        String token = extractToken(authorization);
-
+    public String createOrder(String token, OrderRequest orderRequest) {
         // Option 수량 차감
         boolean updated = optionService.decreaseOptionQuantity(orderRequest.getOptionId(), orderRequest.getQuantity());
 
@@ -65,20 +61,12 @@ public class OrderService {
 
         // 이메일로 사용자 조회
         User user = userService.findByEmail(email);
-        if (user != null && wishListService.isProductInWishList(email, orderRequest.getProductId())) {
+        if (wishListService.isProductInWishList(email, orderRequest.getProductId())) {
             // 위시리스트에서 주문한 제품 ID 삭제
             wishListService.removeProductFromWishList(email, orderRequest.getProductId());
         }
 
         return "Order created and message sent.";
-    }
-
-    private String extractToken(String authorization) {
-        if (authorization.startsWith("Bearer ")) {
-            return authorization.substring(7);
-        } else {
-            throw new IllegalArgumentException("Invalid authorization header");
-        }
     }
 
     private boolean sendKakaoMessage(String accessToken, OrderRequest orderRequest) {
@@ -88,7 +76,7 @@ public class OrderService {
 
         String productName = productService.getProductNameById(orderRequest.getProductId());
         String optionName = optionService.getOptionNameById(orderRequest.getOptionId());
-
+        // 현재 시각을 포맷팅
         LocalDateTime orderDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateTime = orderDateTime.format(formatter);
@@ -101,6 +89,7 @@ public class OrderService {
         try {
             MultiValueMap<String, String> parameters = new LinkedMultiValueMap<>();
             parameters.add("template_object", objectMapper.writeValueAsString(createMessagePayload(messageContent)));
+
 
             return webClient.post()
                 .uri(kakaoProperties.getSendMessageUrl())

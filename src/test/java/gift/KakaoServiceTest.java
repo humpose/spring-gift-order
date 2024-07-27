@@ -28,28 +28,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ContextConfiguration(classes = KakaoServiceTest.TestConfig.class)
 public class KakaoServiceTest {
 
-
     @Autowired
     private KakaoService kakaoService;
 
     @Autowired
-    @Qualifier("kakaoWebClient")
-    private WebClient webClient;
+    private KakaoWebClient kakaoWebClient;
 
     private MockWebServer mockWebServer;
 
     @Configuration
     static class TestConfig {
-        @Bean
-        public WebClient.Builder webClientBuilder() {
-            return WebClient.builder();
-        }
-
-        @Bean(name = "kakaoWebClient")
-        public WebClient kakaoWebClient(WebClient.Builder webClientBuilder) {
-            return webClientBuilder.build();
-        }
-
         @Bean
         public KakaoProperties kakaoProperties() {
             return new KakaoProperties(
@@ -63,8 +51,13 @@ public class KakaoServiceTest {
         }
 
         @Bean
-        public KakaoService kakaoService(KakaoProperties kakaoProperties, @Qualifier("kakaoWebClient") WebClient webClient) {
-            return new KakaoService(kakaoProperties, webClient);
+        public KakaoWebClient kakaoWebClient(KakaoProperties kakaoProperties) {
+            return new KakaoWebClient(kakaoProperties);
+        }
+
+        @Bean
+        public KakaoService kakaoService(KakaoProperties kakaoProperties, KakaoWebClient kakaoWebClient) {
+            return new KakaoService(kakaoProperties, kakaoWebClient);
         }
     }
 
@@ -83,7 +76,8 @@ public class KakaoServiceTest {
             mockWebServer.url("/").toString()
         );
 
-        kakaoService = new KakaoService(kakaoProperties, webClient.mutate().baseUrl(mockWebServer.url("/").toString()).build());
+        kakaoWebClient = new KakaoWebClient(kakaoProperties);
+        kakaoService = new KakaoService(kakaoProperties, kakaoWebClient);
     }
 
     @AfterEach
