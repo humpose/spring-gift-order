@@ -15,7 +15,6 @@ public class KakaoProperties {
     private final String baseUrl;
 
     // Constructor
-    @ConstructorBinding
     public KakaoProperties(String clientId, String redirectUri, String tokenUrl, String userInfoUrl, String sendMessageUrl, String baseUrl) {
         this.clientId = clientId;
         this.redirectUri = redirectUri;
